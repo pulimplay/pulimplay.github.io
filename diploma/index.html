@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#FFF6E0">
+  <title>Diploma da Turma do Pulim</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="vendor/pdf-lib.min.js" defer></script>
+  <script src="vendor/fontkit.umd.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header><h1>Diploma da Turma do Pulim</h1></header>
+  <main>
+    <form id="diploma-form" class="card">
+      <div>
+        <label for="nome">Nome da criança</label>
+        <input id="nome" type="text" maxlength="30" autocomplete="off" required>
+      </div>
+      <fieldset>
+        <legend>Kit</legend>
+        <div class="kits">
+          <label class="kit">
+            <input type="radio" name="kit" value="olimpiada" checked>
+            <span><img src="img/diploma-olimpiada.png" alt="" width="2480" height="3508">Olimpíada da Família</span>
+          </label>
+          <label class="kit">
+            <input type="radio" name="kit" value="detetives">
+            <span><img src="img/diploma-detetives.png" alt="" width="2480" height="3508">Detetives da IA</span>
+          </label>
+          <label class="kit">
+            <input type="radio" name="kit" value="ferias">
+            <span><img src="img/diploma-ferias.png" alt="" width="2480" height="3508">Férias de Verão</span>
+          </label>
+        </div>
+      </fieldset>
+      <div>
+        <label for="entregue">Entregue por <small>(opcional)</small></label>
+        <input id="entregue" type="text" maxlength="30" autocomplete="off" placeholder="Papai e Mamãe">
+      </div>
+      <div>
+        <label for="data">Data</label>
+        <input id="data" type="text" maxlength="10" placeholder="dd/mm/aaaa" aria-describedby="formato-data" autocomplete="off">
+        <small id="formato-data">Use o formato dia/mês/ano.</small>
+      </div>
+    </form>
+    <section class="card preview" aria-labelledby="preview-title">
+      <h2 id="preview-title">Prévia do diploma</h2>
+      <canvas id="diploma" width="2480" height="3508" role="img" aria-label="Prévia do diploma"></canvas>
+      <div class="actions">
+        <button id="baixar" type="submit" form="diploma-form" disabled>Baixar PDF</button>
+        <button id="imprimir" type="button" disabled>Imprimir</button>
+      </div>
+      <p id="status" role="status">Carregando a prévia…</p>
+    </section>
+  </main>
+  <footer><a href="/">Pulim Play · Kits para brincar sem tela</a></footer>
+</body>
+</html>
