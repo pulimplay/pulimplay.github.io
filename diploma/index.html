@@ -1,71 +1,60 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#FFF6E0">
-<title>Diploma da Turma do Pulim · Pulim Play</title>
-<meta name="description" content="Crie o diploma da Turma do Pulim com o nome da criança, pronto para imprimir.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#FFF6E0">
+  <title>Diploma da Turma do Pulim</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="vendor/pdf-lib.min.js" defer></script>
+  <script src="vendor/fontkit.umd.min.js" defer></script>
+  <script src="app.js" defer></script>
 </head>
 <body>
-<header class="top">
-  <a href="../" aria-label="Pulim Play, página inicial"><img src="../img/logo.webp" alt="Pulim Play" width="120" height="51"></a>
-</header>
-
-<main class="wrap">
-  <h1>Diploma da <span>Turma do Pulim</span></h1>
-  <p class="lead">Escreva o nome, escolha o kit e baixe o diploma pronto para imprimir.</p>
-
-  <div class="grid">
-    <form id="form" class="card" novalidate>
-      <fieldset class="kits">
-        <legend>Qual kit a criança completou?</legend>
-        <label class="kit"><input type="radio" name="kit" value="olimpiada" checked><img src="img/mini-olimpiada.webp" alt="" width="140" height="198"><span>Olimpíada da Família</span></label>
-        <label class="kit"><input type="radio" name="kit" value="detetives"><img src="img/mini-detetives.webp" alt="" width="140" height="198"><span>Detetives da IA</span></label>
-        <label class="kit"><input type="radio" name="kit" value="ferias"><img src="img/mini-ferias.webp" alt="" width="140" height="198"><span>Férias de Verão</span></label>
-      </fieldset>
-
-      <label class="field">
-        <span>Nome da criança</span>
-        <input id="nome" name="nome" type="text" maxlength="30" autocomplete="off" autocapitalize="words" placeholder="Ex.: Gabriel" required aria-describedby="nome-erro">
-        <small id="nome-erro" class="erro" hidden>Escreva o nome da criança.</small>
-      </label>
-
-      <label class="field">
-        <span>Entregue por <em>(opcional)</em></span>
-        <input id="entregue" name="entregue" type="text" maxlength="30" autocomplete="off" autocapitalize="words" placeholder="Ex.: Papai e Mamãe">
-      </label>
-
-      <label class="field">
-        <span>Data</span>
-        <input id="data" name="data" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa">
-      </label>
-
-      <div class="acoes">
-        <button type="submit" class="btn" id="baixar">Baixar PDF</button>
-        <button type="button" class="btn sec" id="imprimir">Imprimir</button>
+  <header><h1>Diploma da Turma do Pulim</h1></header>
+  <main>
+    <form id="diploma-form" class="card">
+      <div>
+        <label for="nome">Nome da criança</label>
+        <input id="nome" type="text" maxlength="30" autocomplete="off" required>
       </div>
-      <p class="nota">Nada do que você escreve sai do seu celular: o diploma é feito aqui mesmo.</p>
+      <fieldset>
+        <legend>Kit</legend>
+        <div class="kits">
+          <label class="kit">
+            <input type="radio" name="kit" value="olimpiada" checked>
+            <span><img src="img/diploma-olimpiada.png" alt="" width="2480" height="3508">Olimpíada da Família</span>
+          </label>
+          <label class="kit">
+            <input type="radio" name="kit" value="detetives">
+            <span><img src="img/diploma-detetives.png" alt="" width="2480" height="3508">Detetives da IA</span>
+          </label>
+          <label class="kit">
+            <input type="radio" name="kit" value="ferias">
+            <span><img src="img/diploma-ferias.png" alt="" width="2480" height="3508">Férias de Verão</span>
+          </label>
+        </div>
+      </fieldset>
+      <div>
+        <label for="entregue">Entregue por <small>(opcional)</small></label>
+        <input id="entregue" type="text" maxlength="30" autocomplete="off" placeholder="Papai e Mamãe">
+      </div>
+      <div>
+        <label for="data">Data</label>
+        <input id="data" type="text" maxlength="10" placeholder="dd/mm/aaaa" aria-describedby="formato-data" autocomplete="off">
+        <small id="formato-data">Use o formato dia/mês/ano.</small>
+      </div>
     </form>
-
-    <section class="previa" aria-label="Prévia do diploma">
-      <canvas id="tela" width="1240" height="1754" role="img" aria-label="Prévia do diploma com o nome digitado"></canvas>
+    <section class="card preview" aria-labelledby="preview-title">
+      <h2 id="preview-title">Prévia do diploma</h2>
+      <canvas id="diploma" width="2480" height="3508" role="img" aria-label="Prévia do diploma"></canvas>
+      <div class="actions">
+        <button id="baixar" type="submit" form="diploma-form" disabled>Baixar PDF</button>
+        <button id="imprimir" type="button" disabled>Imprimir</button>
+      </div>
+      <p id="status" role="status">Carregando a prévia…</p>
     </section>
-  </div>
-</main>
-
-<footer class="rodape">
-  <a href="../">Pulim Play · Kits para brincar sem tela</a>
-</footer>
-
-<img id="impressao" alt="" aria-hidden="true">
-
-<script src="vendor/pdf-lib.min.js"></script>
-<script src="vendor/fontkit.umd.min.js"></script>
-<script src="app.js"></script>
+  </main>
+  <footer><a href="/">Pulim Play · Kits para brincar sem tela</a></footer>
 </body>
 </html>

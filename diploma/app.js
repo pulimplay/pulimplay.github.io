@@ -1,175 +1,201 @@
-(() => {
-  'use strict';
+'use strict';
 
-  const IMG_W = 2480, IMG_H = 3508;           // arte original (300 dpi)
-  const PDF_W = 595.28, PDF_H = 841.89;       // A4 em pontos
-  const SHIFT = 0.36;                         // baseline = centro + SHIFT * tamanho (centraliza a altura das maiúsculas)
+const form = document.querySelector('#diploma-form');
+const nome = document.querySelector('#nome');
+const entregue = document.querySelector('#entregue');
+const data = document.querySelector('#data');
+const canvas = document.querySelector('#diploma');
+const context = canvas.getContext('2d');
+const baixar = document.querySelector('#baixar');
+const imprimir = document.querySelector('#imprimir');
+const status = document.querySelector('#status');
+const pageWidth = 595.28;
+const pageHeight = 841.89;
+const scale = pageWidth / canvas.width;
+const artworks = new Map(
+  [...form.querySelectorAll('input[name="kit"]')].map(input => [
+    input.value, input.labels[0].querySelector('img'),
+  ]),
+);
+let campos;
+let fontBytes;
+let diplomaFont;
+let busy = false;
 
-  const $ = (id) => document.getElementById(id);
-  const form = $('form'), nome = $('nome'), entregue = $('entregue'), data = $('data');
-  const tela = $('tela'), ctx = tela.getContext('2d');
-  const btnPdf = $('baixar'), btnPrint = $('imprimir');
+const today = new Date();
+const twoDigits = number => String(number).padStart(2, '0');
+data.value = [
+  twoDigits(today.getDate()), twoDigits(today.getMonth() + 1), today.getFullYear(),
+].join('/');
 
-  let campos = null, fontBytes = null, fonteOk = false;
-  const previas = {};
+async function fetchAsset(path) {
+  const response = await fetch(path);
+  if (!response.ok) throw new Error('Falha ao carregar ' + path);
+  return response;
+}
 
-  const kitAtual = () => form.querySelector('input[name="kit"]:checked').value;
+function currentDiploma() {
+  const kit = form.elements.kit.value;
+  const values = { nome: nome.value, entregue: entregue.value, data: data.value };
+  const fields = Object.entries(values).flatMap(([key, value]) => {
+    const text = value.trim().normalize('NFC');
+    if (!text) return [];
 
-  // data padrão: hoje
-  const hoje = new Date();
-  data.value = [hoje.getDate(), hoje.getMonth() + 1].map(n => String(n).padStart(2, '0')).join('/') + '/' + hoje.getFullYear();
+    const box = campos.kits[kit][key];
+    const run = diplomaFont.layout(text);
+    const units = diplomaFont.unitsPerEm;
+    const textWidth = run.glyphs.reduce((width, glyph) => width + glyph.advanceWidth, 0);
+    const { minY, maxY } = run.bbox;
+    if (!Number.isFinite(minY) || !Number.isFinite(maxY)) return [];
 
-  // máscara simples dd/mm/aaaa
-  data.addEventListener('input', () => {
-    const d = data.value.replace(/\D/g, '').slice(0, 8);
-    data.value = d.length > 4 ? `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}` : d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
+    const widthPerPoint = textWidth / units;
+    const available = box.largura * scale;
+    const size = Math.max(box.fonte_min_pt, Math.min(box.fonte_max_pt, available / widthPerPoint));
+    const width = size * widthPerPoint;
+    const stretch = width > available ? available / width : 1;
+    const centerX = (box.x + box.largura / 2) * scale;
+    const centerY = (box.y + box.altura / 2) * scale;
+    const baselineOffset = (minY + maxY) / 2 * size / units;
+
+    return [{
+      text, size, stretch, color: box.cor,
+      x: centerX - width * stretch / 2,
+      baseline: centerY + baselineOffset,
+    }];
   });
 
-  function textos() {
-    return { nome: nome.value.trim(), entregue: entregue.value.trim(), data: data.value.trim() };
+  return { artwork: artworks.get(kit), fields, name: values.nome.trim().normalize('NFC') };
+}
+
+function updatePreview() {
+  if (!diplomaFont) return;
+
+  const { artwork, fields, name } = currentDiploma();
+  context.drawImage(artwork, 0, 0, canvas.width, canvas.height);
+  context.textBaseline = 'alphabetic';
+  for (const field of fields) {
+    context.save();
+    context.translate(field.x / scale, field.baseline / scale);
+    context.scale(field.stretch, 1);
+    context.font = '800 ' + field.size / scale + 'px "Baloo Diploma"';
+    context.fillStyle = field.color;
+    context.fillText(field.text, 0, 0);
+    context.restore();
   }
 
-  // maior tamanho (em pt) entre max e min que cabe na largura; mede com a função recebida
-  function caber(texto, c, medir) {
-    let pt = c.fonte_max_pt;
-    while (pt > c.fonte_min_pt && medir(texto, pt) > c.largura_pt) pt -= 0.5;
-    return pt;
+  const kitLabel = artwork.parentElement.textContent.trim();
+  canvas.setAttribute('aria-label', name
+    ? 'Prévia do diploma de ' + name + ' — ' + kitLabel
+    : 'Prévia do diploma — ' + kitLabel);
+}
+
+function validate() {
+  for (const input of [nome, entregue]) {
+    const value = input.value.trim().normalize('NFC');
+    const supported = [...value].every(character => diplomaFont.hasGlyphForCodePoint(character.codePointAt(0)));
+    input.setCustomValidity(supported ? '' : 'Use caracteres disponíveis na fonte do diploma.');
+  }
+  if (!nome.value.trim()) nome.setCustomValidity('Digite o nome da criança.');
+
+  const value = data.value.trim();
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value);
+  let validDate = !value;
+  if (match) {
+    const [, day, month, year] = match.map(Number);
+    const date = new Date(0);
+    date.setFullYear(year, month - 1, day);
+    validDate = year > 0 && date.getFullYear() === year
+      && date.getMonth() === month - 1 && date.getDate() === day;
+  }
+  data.setCustomValidity(validDate ? '' : 'Digite uma data válida no formato dd/mm/aaaa.');
+  return form.reportValidity();
+}
+
+async function createPdf({ artwork, fields }) {
+  const { PDFDocument, rgb, pushGraphicsState, concatTransformationMatrix, popGraphicsState } = PDFLib;
+  const pdf = await PDFDocument.create();
+  pdf.registerFontkit(fontkit);
+  const font = await pdf.embedFont(fontBytes, { subset: true });
+  const imageBytes = await (await fetchAsset(artwork.getAttribute('src'))).arrayBuffer();
+  const image = await pdf.embedPng(imageBytes);
+  const page = pdf.addPage([pageWidth, pageHeight]);
+  page.drawImage(image, { x: 0, y: 0, width: pageWidth, height: pageHeight });
+
+  for (const field of fields) {
+    const hex = field.color.slice(1);
+    const [red, green, blue] = hex.match(/../g).map(channel => Number.parseInt(channel, 16) / 255);
+    page.pushOperators(pushGraphicsState(),
+      concatTransformationMatrix(field.stretch, 0, 0, 1, field.x, pageHeight - field.baseline));
+    page.drawText(field.text, { x: 0, y: 0, font, size: field.size, color: rgb(red, green, blue) });
+    page.pushOperators(popGraphicsState());
   }
 
-  function carregarImagem(src) {
-    return new Promise((ok, erro) => { const i = new Image(); i.onload = () => ok(i); i.onerror = erro; i.src = src; });
+  return pdf.save();
+}
+
+form.addEventListener('input', () => {
+  nome.setCustomValidity('');
+  entregue.setCustomValidity('');
+  data.setCustomValidity('');
+  updatePreview();
+});
+
+form.addEventListener('submit', async event => {
+  event.preventDefault();
+  if (!diplomaFont || busy || !validate()) return;
+
+  busy = true;
+  baixar.disabled = true;
+  status.textContent = 'Gerando o PDF…';
+  try {
+    const diploma = currentDiploma();
+    const bytes = await createPdf(diploma);
+    const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+    const link = document.createElement('a');
+    const filename = diploma.name.toLocaleLowerCase('pt-BR').replace(/[^\p{L}\p{M}\p{N}]+/gu, '-')
+      .replace(/^-|-$/g, '');
+    link.href = url;
+    link.download = 'diploma-' + (filename || 'crianca') + '.pdf';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    status.textContent = '';
+  } catch (error) {
+    console.error(error);
+    status.textContent = 'Não foi possível gerar o PDF. Tente novamente.';
+  } finally {
+    busy = false;
+    baixar.disabled = false;
   }
+});
 
-  async function previa(kit) {
-    if (!previas[kit]) previas[kit] = carregarImagem(`img/prev-${kit}.webp`);
-    return previas[kit];
+imprimir.addEventListener('click', () => {
+  if (diplomaFont && validate()) {
+    updatePreview();
+    window.print();
   }
+});
 
-  // desenha num canvas qualquer, na largura dele
-  async function desenhar(canvas, fundo) {
-    const c2 = canvas.getContext('2d');
-    const W = canvas.width, H = canvas.height, esc = W / IMG_W, ptPx = W / PDF_W;
-    c2.clearRect(0, 0, W, H);
-    c2.drawImage(fundo, 0, 0, W, H);
-    if (!campos) return;
-    const cfg = campos.kits[kitAtual()], t = textos();
-    for (const chave of ['nome', 'entregue', 'data']) {
-      const txt = t[chave];
-      if (!txt) continue;
-      const c = cfg[chave];
-      const medir = (s, pt) => { c2.font = `800 ${pt * ptPx}px Baloo2PDF, 'Baloo 2', sans-serif`; return c2.measureText(s).width / ptPx; };
-      const pt = caber(txt, { ...c, largura_pt: c.largura * PDF_W / IMG_W }, medir);
-      c2.font = `800 ${pt * ptPx}px Baloo2PDF, 'Baloo 2', sans-serif`;
-      c2.fillStyle = c.cor;
-      c2.textAlign = 'center';
-      c2.textBaseline = 'alphabetic';
-      const cx = (c.x + c.largura / 2) * esc;
-      const cy = (c.y + c.altura / 2) * esc + SHIFT * pt * ptPx;
-      c2.fillText(txt, cx, cy);
-    }
+async function initialize() {
+  try {
+    const [positions, bytes] = await Promise.all([
+      fetchAsset('campos.json').then(response => response.json()),
+      fetchAsset('fonts/Baloo2-ExtraBold.ttf').then(response => response.arrayBuffer()),
+      document.fonts.load('800 16px "Baloo Diploma"'),
+      ...[...artworks.values()].map(image => image.decode()),
+    ]);
+    campos = positions;
+    fontBytes = bytes;
+    diplomaFont = fontkit.create(new Uint8Array(bytes));
+    updatePreview();
+    status.textContent = '';
+    baixar.disabled = false;
+    imprimir.disabled = false;
+  } catch (error) {
+    console.error(error);
+    status.textContent = 'Não foi possível carregar o diploma. Recarregue a página para tentar novamente.';
   }
+}
 
-  async function atualizar() {
-    try { await desenhar(tela, await previa(kitAtual())); } catch (e) { console.error(e); }
-  }
-
-  function validar() {
-    const ok = nome.value.trim().length > 0;
-    nome.setAttribute('aria-invalid', ok ? 'false' : 'true');
-    $('nome-erro').hidden = ok;
-    if (!ok) nome.focus();
-    return ok;
-  }
-
-  function nomeArquivo() {
-    const base = nome.value.trim().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    return `diploma-${base || 'pulim'}.pdf`;
-  }
-
-  async function gerarPdf() {
-    const { PDFDocument, rgb } = window.PDFLib;
-    const kit = kitAtual(), cfg = campos.kits[kit], t = textos();
-    const doc = await PDFDocument.create();
-    doc.registerFontkit(window.fontkit);
-    doc.setTitle(`Diploma · ${t.nome}`);
-    doc.setAuthor('Pulim Play');
-    const fonte = await doc.embedFont(fontBytes, { subset: true });
-    const png = await doc.embedPng(await (await fetch(`img/diploma-${kit}.png`)).arrayBuffer());
-    const pag = doc.addPage([PDF_W, PDF_H]);
-    pag.drawImage(png, { x: 0, y: 0, width: PDF_W, height: PDF_H });
-    const s = PDF_W / IMG_W;
-    for (const chave of ['nome', 'entregue', 'data']) {
-      const txt = t[chave];
-      if (!txt) continue;
-      const c = cfg[chave];
-      const pt = caber(txt, { ...c, largura_pt: c.largura * s }, (str, size) => fonte.widthOfTextAtSize(str, size));
-      const w = fonte.widthOfTextAtSize(txt, pt);
-      const cx = (c.x + c.largura / 2) * s;
-      const cyTopo = (c.y + c.altura / 2) * s;
-      const hex = c.cor.replace('#', '');
-      pag.drawText(txt, {
-        x: cx - w / 2,
-        y: PDF_H - cyTopo - SHIFT * pt,
-        size: pt,
-        font: fonte,
-        color: rgb(parseInt(hex.slice(0, 2), 16) / 255, parseInt(hex.slice(2, 4), 16) / 255, parseInt(hex.slice(4, 6), 16) / 255)
-      });
-    }
-    return doc.save();
-  }
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!validar() || !campos || !fontBytes) return;
-    btnPdf.disabled = true; btnPdf.textContent = 'Gerando…';
-    try {
-      const bytes = await gerarPdf();
-      const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
-      const a = document.createElement('a');
-      a.href = url; a.download = nomeArquivo();
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
-    } catch (err) {
-      console.error(err);
-      alert('Não consegui gerar o PDF. Tente de novo ou use o botão Imprimir.');
-    } finally {
-      btnPdf.disabled = false; btnPdf.textContent = 'Baixar PDF';
-    }
-  });
-
-  btnPrint.addEventListener('click', async () => {
-    if (!validar()) return;
-    btnPrint.disabled = true;
-    try {
-      const fundo = await carregarImagem(`img/diploma-${kitAtual()}.png`);
-      const c = document.createElement('canvas');
-      c.width = IMG_W; c.height = IMG_H;
-      await desenhar(c, fundo);
-      const img = $('impressao');
-      await new Promise(ok => { img.onload = ok; img.src = c.toDataURL('image/png'); });
-      window.print();
-    } catch (err) { console.error(err); }
-    finally { btnPrint.disabled = false; }
-  });
-
-  form.addEventListener('input', (e) => {
-    if (e.target === nome && nome.value.trim()) { nome.setAttribute('aria-invalid', 'false'); $('nome-erro').hidden = true; }
-    atualizar();
-  });
-  form.addEventListener('change', atualizar);
-
-  // carregamento inicial: posições, fonte (para o canvas e para o PDF) e primeira prévia
-  (async () => {
-    try {
-      const [cfg, bytes] = await Promise.all([
-        fetch('campos.json').then(r => r.json()),
-        fetch('fonts/Baloo2-ExtraBold.ttf').then(r => r.arrayBuffer())
-      ]);
-      campos = cfg; fontBytes = bytes;
-      const ff = new FontFace('Baloo2PDF', bytes, { weight: '800' });
-      await ff.load(); document.fonts.add(ff); fonteOk = true;
-    } catch (e) { console.error(e); }
-    atualizar();
-    ['olimpiada', 'detetives', 'ferias'].forEach(previa);
-  })();
-})();
+initialize();
