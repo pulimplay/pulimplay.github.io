@@ -1,0 +1,107 @@
+{
+  "imagem_px": [
+    2480,
+    3508
+  ],
+  "dpi": 300,
+  "fonte": "Baloo 2 ExtraBold",
+  "obs": "x,y = canto superior esquerdo da caixa de texto, em px na imagem 2480x3508. Texto centralizado na caixa (horizontal e vertical). Tamanho em pt para A4 (1pt = 1/72 pol).",
+  "kits": {
+    "detetives": {
+      "nome": {
+        "x": 472,
+        "y": 1234,
+        "largura": 1535,
+        "altura": 224,
+        "fonte_max_pt": 40,
+        "fonte_min_pt": 18,
+        "cor": "#1B3A4B",
+        "alinhamento": "centro"
+      },
+      "entregue": {
+        "x": 283,
+        "y": 2905,
+        "largura": 874,
+        "altura": 118,
+        "fonte_max_pt": 17,
+        "fonte_min_pt": 10,
+        "cor": "#1B3A4B",
+        "alinhamento": "centro"
+      },
+      "data": {
+        "x": 1323,
+        "y": 2905,
+        "largura": 874,
+        "altura": 118,
+        "fonte_max_pt": 17,
+        "fonte_min_pt": 10,
+        "cor": "#1B3A4B",
+        "alinhamento": "centro"
+      }
+    },
+    "olimpiada": {
+      "nome": {
+        "x": 472,
+        "y": 1234,
+        "largura": 1535,
+        "altura": 224,
+        "fonte_max_pt": 40,
+        "fonte_min_pt": 18,
+        "cor": "#1B3A4B",
+        "alinhamento": "centro"
+      },
+      "entregue": {
+        "x": 283,
+        "y": 2905,
+        "largura": 874,
+        "altura": 118,
+        "fonte_max_pt": 17,
+        "fonte_min_pt": 10,
+        "cor": "#1B3A4B",
+        "alinhamento": "centro"
+      },
+      "data": {
+        "x": 1323,
+        "y": 2905,
+        "largura": 874,
+        "altura": 118,
+        "fonte_max_pt": 17,
+        "fonte_min_pt": 10,
+        "cor": "#1B3A4B",
+        "alinhamento": "centro"
+      }
+    },
+    "ferias": {
+      "nome": {
+        "x": 472,
+        "y": 1234,
+        "largura": 1535,
+        "altura": 224,
+        "fonte_max_pt": 40,
+        "fonte_min_pt": 18,
+        "cor": "#1B3A4B",
+        "alinhamento": "centro"
+      },
+      "entregue": {
+        "x": 283,
+        "y": 2905,
+        "largura": 874,
+        "altura": 118,
+        "fonte_max_pt": 17,
+        "fonte_min_pt": 10,
+        "cor": "#1B3A4B",
+        "alinhamento": "centro"
+      },
+      "data": {
+        "x": 1323,
+        "y": 2905,
+        "largura": 874,
+        "altura": 118,
+        "fonte_max_pt": 17,
+        "fonte_min_pt": 10,
+        "cor": "#1B3A4B",
+        "alinhamento": "centro"
+      }
+    }
+  }
+}

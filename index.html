@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pulim Play · Kits sem tela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: alegre, de família, frases curtas, nunca vendedor de feira.
+   IDEA: a página se comporta como um kit da Pulim impresso: faixas coloridas com ondinhas, papel areia, turma pulando.
+   PICTURE: os três kits em leque, com a turma pulando por cima das faixas.
+   COLOUR and TYPE: areia + turquesa dominantes, laranja de destaque, azul-noite no texto; Baloo 2 nos títulos, Poppins no corpo.
+   LAYOUT: coluna única no celular; capa, isca, kits, combo, como funciona, turma, perguntas, afiliados. */
+:root{color-scheme:light dark;--bg:light-dark(#FFF6E0,#10232d);--card:light-dark(#ffffff,#183442);--ink:light-dark(#1B3A4B,#FFF6E0);--soft:light-dark(#5B7380,#b9c9cf);
+--lar:#FF7A45;--ama:#FFC93C;--tur:#2EC4B6;--mar:#3FA7D6;--ver:#6BCB77;--noite:#1B3A4B;--areia:#FFF6E0}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Poppins,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:'Baloo 2',Poppins,sans-serif;font-weight:800;line-height:1.05;text-wrap:balance;margin:0}
+h1{font-size:clamp(38px,6.4vw,58px)}h2{font-size:clamp(30px,4.4vw,44px)}h3{font-size:24px}
+p{margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding:0 max(5vw,16px)}
+.band{padding:clamp(36px,5vw,72px) 0;position:relative}
+.wave{height:22px;background:radial-gradient(circle at 50% 0,var(--c) 11px,transparent 11.5px) 0 0/33px 22px repeat-x}
+.wave.up{background:radial-gradient(circle at 50% 100%,var(--c) 11px,transparent 11.5px) 0 0/33px 22px repeat-x}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 24px;border-radius:999px;font:700 16px Poppins;text-decoration:none;border:0;cursor:pointer}
+.btn:focus-visible{outline:3px solid var(--mar);outline-offset:3px}
+.btn.lar{background:var(--lar);color:#fff}.btn.noite{background:var(--noite);color:#fff}.btn.clara{background:#fff;color:var(--noite)}
+.pill{display:inline-block;background:var(--card);border-radius:999px;padding:5px 14px;font:600 13px Poppins}
+/* capa */
+.hero{background:var(--bg);padding-top:20px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.top img{height:44px}.top a{font:600 14px Poppins;color:var(--ink)}
+.hgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:32px;align-items:center;padding:28px 0 8px}
+.hgrid p.lead{font:500 18px/1.5 Poppins;margin:16px 0 24px;max-width:34em}
+.hpic{position:relative}
+.hpic img.combo{width:100%;height:auto;display:block}
+.hpic .pula{position:absolute;width:15%;animation:pula 2.4s ease-in-out infinite}
+@keyframes pula{0%,100%{transform:translateY(0)}45%{transform:translateY(-14px)}}
+@media(prefers-reduced-motion:reduce){.hpic .pula{animation:none}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+/* isca */
+.isca{--c:var(--ama);background:var(--ama);color:var(--noite)}
+.isca .wrap{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:24px;align-items:center}
+.isca img{width:120px}
+.isca p{font:500 16px/1.5 Poppins;margin-top:6px}
+/* kits */
+.kits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:28px}
+.kit{background:var(--card);border-radius:22px;overflow:hidden;display:flex;flex-direction:column}
+.kit .pic{background:var(--k);padding:18px 18px 0;display:flex;justify-content:center}
+.kit .pic img{width:100%;max-width:330px;height:auto;display:block;margin-bottom:-6px}
+.kit .body{padding:20px 22px 22px;display:flex;flex-direction:column;gap:10px;flex:1}
+.kit .tag{font:700 13px Poppins;color:var(--k2)}
+.kit ul{margin:0;padding-left:18px;font-size:15px}.kit li{margin:3px 0}
+.kit .price{display:flex;align-items:baseline;gap:8px;margin-top:auto;padding-top:8px}
+.kit .price b{font:800 34px 'Baloo 2',Poppins,sans-serif;white-space:nowrap}
+.kit .price span{font:500 13px Poppins;color:var(--soft)}
+/* combo */
+.combo-band{--c:var(--tur);background:var(--tur);color:var(--noite)}
+.cgrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:30px;align-items:center}
+.cgrid img{width:100%;height:auto}
+.de{font:600 18px Poppins;text-decoration:line-through;opacity:.75}
+.por{font:800 clamp(52px,8vw,76px)/1 'Baloo 2',Poppins,sans-serif;white-space:nowrap}
+/* como funciona */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:26px}
+.step{background:var(--card);border-radius:18px;padding:20px}
+.step b.n{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--mar);color:#fff;font:800 20px 'Baloo 2',Poppins,sans-serif;margin-bottom:10px}
+.regras{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:18px}
+.regra{border-radius:18px;padding:20px;color:var(--noite)}
+/* turma */
+.turma{--c:var(--noite);background:var(--noite);color:var(--areia)}
+.bichos{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;margin-top:26px;align-items:end}
+.bicho{text-align:center}.bicho img{width:100%;height:120px;object-fit:contain}
+.bicho b{display:block;font:800 20px 'Baloo 2',Poppins,sans-serif;margin-top:4px}.bicho span{font:500 12px Poppins;opacity:.8}
+/* faq */
+details{background:var(--card);border-radius:16px;padding:16px 20px;margin-top:12px}
+summary{font:700 17px Poppins;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:12px}
+summary::after{content:'+';font:800 24px/1 'Baloo 2',Poppins,sans-serif;color:var(--lar)}
+details[open] summary::after{content:'–'}
+details p{margin-top:10px;color:var(--soft)}
+.afil{background:var(--card);border-radius:22px;padding:26px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;margin-top:36px}
+footer{--c:var(--noite);background:var(--noite);color:var(--areia);padding:34px 0 40px;font-size:14px}
+footer a{color:var(--ama)}
+.aviso{background:var(--mar);color:#fff;text-align:center;font:600 13px Poppins;padding:8px 12px}
+@media(max-width:860px){.kits,.steps,.regras{grid-template-columns:minmax(0,1fr)}.bichos{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:600px){.hgrid,.cgrid{grid-template-columns:minmax(0,1fr)}.hpic{order:-1}.isca .wrap{grid-template-columns:minmax(0,1fr);text-align:center}.isca img{margin:0 auto}.afil{grid-template-columns:minmax(0,1fr)}.top a{display:none}}
+</style>
+</head>
+<body>
+<div class="aviso" id="aviso">Prévia da página: os botões de compra serão ligados à Kiwify antes do lançamento.</div>
+
+<header class="hero">
+<div class="wrap">
+<div class="top"><img src="img/logo.webp" alt="Pulim Play"><a href="#kits">Ver os kits</a></div>
+<div class="hgrid">
+<div>
+<h1>Brincadeira sem tela, pronta para imprimir hoje.</h1>
+<p class="lead">Kits da Turma do Pulim para a família brincar junto: provas com medalha, missões de detetive e um verão inteiro de aventuras. Um adulto e uma criança já formam o time.</p>
+<a class="btn lar" href="#combo">Quero os 3 kits por R$ 49,90</a>
+<div class="chips"><span class="pill">4 a 10 anos</span><span class="pill">materiais da gaveta</span><span class="pill">PDF na hora</span></div>
+</div>
+<div class="hpic">
+<img class="combo" src="img/combo.webp" alt="Capas dos kits Olimpíada da Família, Detetives da IA e Férias de Verão" width="1400" height="900">
+<img class="pula" src="img/lele.webp" alt="" style="right:-4%;top:-12%">
+<img class="pula" src="img/tiao.webp" alt="" style="left:-6%;bottom:-10%;animation-delay:.6s">
+</div>
+</div>
+</div>
+</header>
+
+<div class="wave" style="--c:var(--bg);background-color:var(--ama)"></div>
+<section class="band isca" id="gratis">
+<div class="wrap">
+<img src="img/bondi.webp" alt="">
+<div>
+<h2>Tem 5 minutos? Comece agora, de graça.</h2>
+<p>Uma meia, um balde e três arremessos. Baixe grátis a primeira prova da Olimpíada da Família, com placar para imprimir, e veja se a tarde rende.</p>
+</div>
+<a class="btn noite" data-link="isca" href="#gratis">Quero a prova grátis</a>
+</div>
+</section>
+<div class="wave" style="--c:var(--ama)"></div>
+
+<section class="band" id="kits">
+<div class="wrap">
+<h2>Escolha a aventura</h2>
+<p style="margin-top:10px;color:var(--soft)">Cada kit é um PDF para imprimir quantas vezes quiser em casa. Tudo funciona com o que já tem na gaveta.</p>
+<div class="kits" id="lista"></div>
+</div>
+</section>
+
+<div class="wave up" style="--c:var(--tur)"></div>
+<section class="band combo-band" id="combo">
+<div class="wrap cgrid">
+<img src="img/combo.webp" alt="Os três kits juntos" loading="lazy">
+<div>
+<p style="font:700 14px Poppins">OFERTA DE LANÇAMENTO</p>
+<h2 style="margin:6px 0 12px">Os 3 kits juntos</h2>
+<p>Olimpíada da Família, Detetives da IA e Férias de Verão: provas, missões e brincadeiras para as férias inteiras.</p>
+<p style="margin-top:16px"><span class="de">R$ 74,70</span></p>
+<p class="por">R$ 49,90</p>
+<a class="btn noite" data-link="combo" href="#combo" style="margin-top:16px">Quero o combo</a>
+</div>
+</div>
+</section>
+<div class="wave" style="--c:var(--tur)"></div>
+
+<section class="band">
+<div class="wrap">
+<h2>Como funciona</h2>
+<div class="steps">
+<div class="step"><b class="n">1</b><h3>Escolha</h3><p>Pague por Pix ou cartão no site da Kiwify, em ambiente seguro.</p></div>
+<div class="step"><b class="n">2</b><h3>Receba</h3><p>O PDF chega no seu e-mail logo depois da compra.</p></div>
+<div class="step"><b class="n">3</b><h3>Brinque</h3><p>Imprima só as páginas do dia. Várias provas dá para jogar até sem imprimir.</p></div>
+</div>
+<div class="regras">
+<div class="regra" style="background:var(--ama)"><h3>Regra da gaveta</h3><p>Meia, colher, garrafa, papel e lápis. Nada de comprar material.</p></div>
+<div class="regra" style="background:var(--tur)"><h3>Família é quem está com a criança</h3><p>Mãe, pai, avó, tio, padrinho. Tem modo solo e modo duas casas.</p></div>
+<div class="regra" style="background:var(--lar);color:#fff"><h3>Para brincar junto</h3><p>Nada de folha de exercício: é jogo, risada, medalha e revanche.</p></div>
+</div>
+</div>
+</section>
+
+<div class="wave up" style="--c:var(--noite)"></div>
+<section class="band turma">
+<div class="wrap">
+<h2>Conheça a Turma do Pulim</h2>
+<p style="margin-top:10px;opacity:.85">Cada bicho tem o nome de “pulo” numa língua do mundo, e cada um comanda uma brincadeira.</p>
+<div class="bichos" id="bichos"></div>
+</div>
+</section>
+<div class="wave" style="--c:var(--noite)"></div>
+
+<section class="band">
+<div class="wrap" style="max-width:860px">
+<h2>Perguntas de quem vai comprar</h2>
+<div id="faq"></div>
+<div class="afil">
+<div><h3>Quer indicar a Pulim e ganhar com isso?</h3><p style="margin-top:6px;color:var(--soft)">Professoras, mães e criadores de conteúdo ganham 40% de cada venda feita pelo seu link de afiliado na Kiwify.</p></div>
+<a class="btn lar" data-link="afiliado" href="#faq">Quero ser afiliado</a>
+</div>
+</div>
+</section>
+
+<footer>
+<div class="wrap">
+<img src="img/logo.webp" alt="Pulim Play" style="height:38px;filter:brightness(1.1)">
+<p style="margin-top:12px">Dá um pulo pra fora da tela. Pulim Play é uma marca da Striker 360 Ltda.</p>
+<p style="margin-top:6px">Instagram e TikTok: <a href="https://www.instagram.com/pulimplay">@pulimplay</a></p>
+</div>
+</footer>
+
+<script>
+{
+const LINKS={isca:'tem-5-minutos.pdf',combo:'',olimpiada:'',detetives:'',ferias:'',afiliado:''};
+const KITS=[
+ {id:'olimpiada',nome:'Olimpíada da Família',idade:'4 a 10 anos · 27 páginas',k:'var(--ver)',k2:'#2f8f3c',preco:'24,90',
+  itens:['6 provas com bicho da turma, placar e medalhas','Modos solo, em dupla, em duas casas e a distância','Cartão “Te desafio!” para quem mora longe','Certificado com assinatura do pé']},
+ {id:'detetives',nome:'Detetives da IA',idade:'6 a 10 anos · 19 páginas',k:'var(--mar)',k2:'#1f78a8',preco:'29,90',
+  itens:['9 missões sem tela para entender a inteligência artificial','A regra da casa: eu primeiro, robô depois','Combinado da família para assinar junto','Guia para os adultos e diploma de detetive']},
+ {id:'ferias',nome:'Férias de Verão',idade:'4 a 8 anos · 24 páginas',k:'var(--ama)',k2:'#b07d00',preco:'19,90',
+  itens:['Labirintos, caça-palavras e ligue os pontos','Bingo de férias e caça ao tesouro em casa','3 páginas de colorir com a turma','Diário e certificado de Férias Incríveis']}];
+document.getElementById('lista').innerHTML=KITS.map(k=>`<article class="kit" style="--k:${k.k};--k2:${k.k2}">
+<div class="pic"><img src="img/kit-${k.id}.webp" alt="Páginas do kit ${k.nome}" loading="lazy"></div>
+<div class="body"><span class="tag">${k.idade}</span><h3>${k.nome}</h3><ul>${k.itens.map(i=>`<li>${i}</li>`).join('')}</ul>
+<div class="price"><b>R$ ${k.preco}</b><span>PDF para imprimir</span></div>
+<a class="btn lar" data-link="${k.id}" href="#kits">Comprar</a></div></article>`).join('');
+const BICHOS=[['tiao','Tião','sapo · chinês'],['lele','Lele','golfinha · havaiano'],['bondi','Bondi','canguru · francês'],['pyon','Pyon','coelha · japonês'],['ruka','Ruka','lêmure · suaíli'],['hops','Hops','grilo · alemão'],['jimp','Jimp','robô · “JMP”']];
+document.getElementById('bichos').innerHTML=BICHOS.map(([f,n,s])=>`<div class="bicho"><img src="img/${f}.webp" alt="${n}"><b>${n}</b><span>${s}</span></div>`).join('');
+const FAQ=[['Como recebo o kit?','Logo depois da compra, o link para baixar o PDF chega no seu e-mail. Pode guardar no celular e imprimir quando quiser.'],
+ ['Precisa de impressora?','Ajuda, mas não é obrigatório. Muitas provas e missões dá para jogar lendo no celular e anotando num papel qualquer.'],
+ ['Posso imprimir mais de uma vez?','Pode, quantas vezes quiser, para a sua família ou para a sua turma da escola. Só não é permitido revender nem compartilhar o arquivo.'],
+ ['Para que idade serve?','A Olimpíada vai de 4 a 10 anos, o Detetives de 6 a 10 e o Férias de 4 a 8. Cada página mostra a idade sugerida.'],
+ ['E se eu me arrepender?','Compras pela internet têm 7 dias para desistir, e o pedido é feito direto na Kiwify.'],
+ ['Precisa de muito material?','Não. Tudo sai da gaveta: meias, colher, garrafas, papel, lápis e fita.']];
+document.getElementById('faq').innerHTML=FAQ.map(([q,a])=>`<details><summary>${q}</summary><p>${a}</p></details>`).join('');
+let falta=0;
+for(const a of document.querySelectorAll('[data-link]')){const u=LINKS[a.dataset.link];if(u){a.href=u;a.target='_blank';a.rel='noopener'}else falta++}
+if(!falta)document.getElementById('aviso').remove();
+}
+</script>
+</body>
+</html>
